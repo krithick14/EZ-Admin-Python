@@ -18,7 +18,7 @@ A Menu Driven Application to ease the work of a Server Administrator/
 <img src =/img/3.png>
 <br>
 
-<h3>START/STOP/RESTART THE SERVER</h3>
+<h3>START / STOP / RESTART THE SERVER</h3>
 <img src =/img/4.png>
 <br>
 
