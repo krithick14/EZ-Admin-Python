@@ -1,9 +1,9 @@
 
 # EZ-ADMIN
 
-CLI Based Menu Driven Software for Linux Server Administration using C++
+GUI Based Software for Linux Server Administration.
 
-A Menu Driven Application to ease the work of a Server Administrator/
+A Application to ease the work of a Server Admin.
 
 <b>STEPS TO USE THIS:</b><br>
         1)Download this executable file from releases and go the file location.<br><br>
