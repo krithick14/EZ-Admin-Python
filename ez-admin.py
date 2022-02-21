@@ -3,14 +3,20 @@ import subprocess as sp
 from datetime import datetime
 import tkinter as tk
 from tkinter import *
-from tkinter import messagebox, Tk, simpledialog
-from Util import *
 from sys import exit
+from tkinter import messagebox, Tk, simpledialog
+
+from Backup import *
+from Servers import *
+from Util import *
 
 now = datetime.now()
 time = now.strftime("%d/%m/%Y %H:%M:%S")
 now = datetime.now()
+
 util=Util()
+server=Server()
+backup=Backup()
 
 def status():
     stat = os.system("pgrep apache2 > /dev/null")
@@ -30,78 +36,34 @@ def get_status():
         return "Server Status : Inactive"
 
 def start():
-    file = open('logs.txt', 'a+')
-    try:
-        exit_code = os.system("sudo service apache2 start 2> /dev/null")
-        server_status.configure(text=get_status())
-        if exit_code != 0:
-            raise Exception("Error in apache2")
-    except Exception as error:
-        messagebox.showerror('Something went wrong :', error)
-        file.write("Server Start Failed by " +
-                   os.environ['USER'].strip()+" on " + time+".\n")
-    else:
-        os.system("killall xterm  2> /dev/null")
-        os.system("xterm -T Client_logs -fa 'Monospace' -fs 12 -e  watch \"tail -n 15 /var/log/apache2/access.log | cut -d \' \'  -f 1,4,5  | tr -s ' ' '\t'  \" & ")
-        file.write("Server Started by " +
-                   os.environ['USER'].strip()+" on " + time+".\n")
+    if server.start()==0:
         start_btn.config(state="disabled")
         stop_btn.config(state="normal")
-        file.close()
+    else:
+        messagebox.showerror('Something went wrong','Error in apache2')
+    server_status.configure(text=get_status())
 
 def stop():
-    file = open('logs.txt', 'a+')
-    try:
-        exit_code = os.system("sudo service apache2 stop 2> /dev/null")
-        if exit_code != 0:
-            raise Exception("Error in apache2")
-    except Exception as error:
-        messagebox.showerror('Something went wrong :', error)
-        file.write("Server Stop Failed by " +
-                   os.environ['USER'].strip()+" on " + time+".\n")
-    else:
-        server_status.configure(text=get_status())
-        os.system("killall xterm  2> /dev/null")
-        file.write("Server Stopped by " +os.environ['USER'].strip()+" on " + time+".\n")
+    if server.stop()==0:
         start_btn.config(state="normal")
         stop_btn.config(state="disabled")
-        file.close()
+    else:
+        messagebox.showerror('Something went wrong','Error in apache2')
+    server_status.configure(text=get_status())
 
 def restart():
-    file = open('logs.txt', 'a+')
-    try:
-        exit_code = os.system("sudo service apache2 restart 2> /dev/null")
-        if exit_code != 0:
-            raise Exception("Error in apache2")
-    except Exception as error:
-        messagebox.showerror('Something went wrong :', error)
-        file.write("Server Restart Failed by " +
-                   os.environ['USER'].strip()+" on " + time+".\n")
-    else:
-        server_status.configure(text=get_status())
-        os.system("killall xterm  2> /dev/null")
-        os.system("xterm -T Client_logs -fa 'Monospace' -fs 12 -e  watch \"tail -n 15 /var/log/apache2/access.log | cut -d \' \'  -f 1,4,5  | tr -s ' ' '\t'  \" & ")
-        file.write("Server Restarted by " +
-                   os.environ['USER'].strip()+" on " + time+".\n")
+    if server.restart()==0:
         start_btn.config(state="disabled")
         stop_btn.config(state="normal")
-        file.close()
+    else:
+        messagebox.showerror('Something went wrong','Error in apache2')
+    server_status.configure(text=get_status())
 
 def do_backup():
-    file = open('logs.txt', 'a+')
-    try:
-        backup_command = "mkdir -p /home/$USER/backup_server && cd /var/www/html &&  sudo tar -cpf /home/$USER/backup_server/backup_$(date +%F).tar.gz ./* && sudo chown $USER /home/$USER/backup_server/backup_$(date +%F).tar.gz > /dev/null"
-        exit_code = os.system(backup_command)
-        if exit_code != 0:
-            raise Exception("Error in Taking Backup")
-    except Exception as error:
-        messagebox.showerror('Something went wrong :', error)
+    if backup.backup() == 0:
+        messagebox.showinfo("Backup", "Backup Saved at " + os.environ['HOME'].strip()+"/backup_server/")
     else:
-        file.write("Server Files Backed up by " +
-                   os.environ['USER'].strip()+" on " + time+".\n")
-        messagebox.showinfo("Backup", "Backup Saved at " +
-                            os.environ['HOME'].strip()+"/backup_server/")
-        file.close()
+        messagebox.showerror('Something went wrong :', 'Error in Taking Backup')
 
 def view_logs():
     file = open('logs.txt', 'r')
@@ -122,7 +84,7 @@ def clear_logs():
     file.close()
 
 def open_search_window():
-    global search_window;
+    global search_window
     search_window=Toplevel(root)
     search_window.title("Search Client Logs")
     search_window.geometry("400x400")
@@ -230,7 +192,7 @@ def search_month():
 
 def do_exit():
     os.system("killall xterm  2> /dev/null")
-    exit(0);
+    exit(0)
 
 root = Tk()
 root.geometry('550x750')
@@ -321,6 +283,7 @@ exit_btn = tk.Button(frame,
                      activeforeground='black')
 exit_btn.pack(fill=tk.X, pady=15)
 
+os.system("sudo echo Welcome Admin > /dev/null ")
 
 status()
 
