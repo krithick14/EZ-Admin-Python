@@ -14,11 +14,11 @@ class Util:
         except:
             return False
         else:
-            months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
             if int(day) > 0 and int(day) <= 31:
                     if month.capitalize() in months:
                         if len(year) == 4:
                             return True
-            return False;
+            return False
 
