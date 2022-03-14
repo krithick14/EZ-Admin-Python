@@ -4,7 +4,7 @@ class Util:
     def validate_ip_address(self,address):
         try:
             self.ip = ipaddress.ip_address(address)
-            return True;
+            return True
         except ValueError:
             return False 
 
